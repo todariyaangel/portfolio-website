@@ -108,7 +108,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // DIGITAL MATRIX RAIN / DATA STREAM CANVAS
+  // INTERACTIVE VORONOI FLUID MESH CANVAS
   useEffect(() => {
     if (!mounted) return;
 
@@ -128,58 +128,68 @@ export default function Home() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Track cursor for glowing data interactive effect
-    let mouseX = -1000;
-    let mouseY = -1000;
+    // Track mouse for interactive fluid warping
+    let mouseX = width / 2;
+    let mouseY = height / 2;
     const handleMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    const fontSize = 14;
-    const columns = Math.floor(width / fontSize);
-    const drops: number[] = [];
-    
-    // Characters used in the matrix rain: binary, hex, math, and data symbols
-    const chars = '01101001010100101010110101010xFF4A89C190λΣ∏∇∂∫';
+    // Voronoi cellular nodes
+    const pointCount = 35;
+    const points: { x: number; y: number; vx: number; vy: number }[] = [];
 
-    for (let i = 0; i < columns; i++) {
-      drops[i] = Math.floor(Math.random() * -100);
+    for (let i = 0; i < pointCount; i++) {
+      points.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: (Math.random() - 0.5) * 0.7
+      });
     }
 
+    let angle = 0;
     const render = () => {
-      // Soft dark fade trail
-      ctx.fillStyle = 'rgba(8, 8, 8, 0.12)';
-      ctx.fillRect(0, 0, width, height);
+      angle += 0.015;
+      ctx.clearRect(0, 0, width, height);
 
-      ctx.font = `${fontSize}px monospace`;
+      // Update cellular points with organic sine wave drift
+      points.forEach((p, idx) => {
+        p.x += p.vx + Math.cos(angle + idx) * 0.3;
+        p.y += p.vy + Math.sin(angle + idx) * 0.3;
 
-      for (let i = 0; i < drops.length; i++) {
-        const char = chars[Math.floor(Math.random() * chars.length)];
-        const x = i * fontSize;
-        const y = drops[i] * fontSize;
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        const dx = x - mouseX;
-        const dy = y - mouseY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Draw glowing cellular node vertex
+        const distToMouse = Math.sqrt((p.x - mouseX) ** 2 + (p.y - mouseY) ** 2);
+        const radius = distToMouse < 200 ? 3.5 : 2;
 
-        // Interactive mouse glow (Cyan/Bright Blue near cursor, soft Violet/Green further away)
-        if (dist < 150) {
-          ctx.fillStyle = '#38bdf8'; // Bright cyan charge
-        } else if (Math.random() > 0.95) {
-          ctx.fillStyle = '#ffffff'; // White lead spark
-        } else {
-          ctx.fillStyle = 'rgba(139, 92, 246, 0.45)'; // Soft neon purple stream
+        ctx.fillStyle = distToMouse < 200 ? '#38bdf8' : 'rgba(139, 92, 246, 0.7)';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Connect nearby points to form dynamic polygonal mesh webs
+        for (let j = idx + 1; j < points.length; j++) {
+          const p2 = points[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 180) {
+            const alpha = (1 - dist / 180) * 0.35;
+            ctx.strokeStyle = distToMouse < 200 ? `rgba(56, 189, 248, ${alpha * 1.8})` : `rgba(139, 92, 246, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
         }
-
-        ctx.fillText(char, x, y);
-
-        if (y > height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
+      });
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -236,11 +246,11 @@ export default function Home() {
       } else if (lower.includes('education') || lower.includes('iit') || lower.includes('guwahati') || lower.includes('degree') || lower.includes('curriculum')) {
         reply = "Angel is pursuing a prestigious B.Sc. (Hons) in Data Science and Artificial Intelligence at the **Indian Institute of Technology (IIT) Guwahati**, expected to complete by September 2030. Her rigorous curriculum covers Data Structures and Algorithms, Machine Learning, Deep Learning, Linear Algebra, Statistics, Probability, and AI Ethics.";
       } else if (lower.includes('soft skill') || lower.includes('communication') || lower.includes('collaborat') || lower.includes('personality')) {
-        reply = "Angel is an exceptionally strong communicator and collaborative team player. She combines deep technical mastery with clear, articulate communication, enabling her to bridge complex engineering architectures with business goals seamlessly.";
+        reply = "Angel is an exceptionally strong communicator and collaborative team player. Sah blends deep technical mastery with clear, articulate communication, enabling her to bridge complex engineering architectures with business goals seamlessly.";
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive Digital Matrix Rain data background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive Voronoi fluid mesh background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
