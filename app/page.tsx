@@ -24,10 +24,6 @@ export default function Home() {
   ]);
   const [input, setInput] = useState('');
 
-  // Control Panel Password Modal State
-  const [showAdminModal, setShowAdminModal] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -167,23 +163,13 @@ export default function Home() {
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive particle background network; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; 5) A glassmorphic Contact form; and 6) An Owner Control Panel at the top nav secured by your private password.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive particle background network; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
       
       setMessages((prev) => [...prev, { sender: 'angel', text: reply }]);
     }, 600);
-  };
-
-  const handleAdminLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (adminPassword === 'angel2030') {
-      window.location.href = '/admin';
-    } else {
-      alert('Incorrect Owner Password!');
-      setAdminPassword('');
-    }
   };
 
   return (
@@ -198,7 +184,7 @@ export default function Home() {
       <div style={{ position: 'absolute', top: '10%', left: '30%', width: '400px', height: '400px', backgroundColor: 'rgba(120, 50, 255, 0.12)', filter: 'blur(130px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
       <div style={{ position: 'absolute', top: '40%', right: '20%', width: '450px', height: '450px', backgroundColor: 'rgba(50, 120, 255, 0.1)', filter: 'blur(140px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
 
-      {/* Navigation Header */}
+      {/* Navigation Header (Control Panel Button Removed for Visitors) */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, backgroundColor: 'rgba(8, 8, 8, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontWeight: 800, letterSpacing: '2px', fontSize: '13px', textTransform: 'uppercase' }}>ANGEL TODARIYA</span>
         <nav style={{ display: 'flex', gap: '28px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', color: '#a1a1aa' }}>
@@ -207,34 +193,9 @@ export default function Home() {
           <a href="#certifications" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Certifications</a>
           <a href="#skills" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Skills</a>
           <a href="#projects" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Projects</a>
-          <button onClick={() => setShowAdminModal(true)} style={{ background: 'none', border: 'none', color: '#f59e0b', fontWeight: 'bold', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', cursor: 'pointer', padding: 0 }}>Control Panel</button>
         </nav>
         <a href="#contact" style={{ backgroundColor: '#ffffff', color: '#000000', padding: '8px 20px', borderRadius: '999px', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', textDecoration: 'none' }}>CONTACT</a>
       </header>
-
-      {/* Owner Control Panel Password Modal */}
-      {showAdminModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ backgroundColor: '#121214', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '24px', padding: '36px', width: '360px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold' }}>Owner Access</h3>
-              <button onClick={() => setShowAdminModal(false)} style={{ background: 'none', border: 'none', color: '#a1a1aa', cursor: 'pointer', fontSize: '16px' }}>✕</button>
-            </div>
-            <p style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '20px' }}>Enter your private password to access the Owner Control Panel.</p>
-            <form onSubmit={handleAdminLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <input 
-                type="password" 
-                value={adminPassword}
-                onChange={(e) => setAdminPassword(e.target.value)}
-                placeholder="Owner Password" 
-                required
-                style={{ backgroundColor: '#000000', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px', padding: '12px', color: '#ffffff', outline: 'none', fontSize: '14px' }}
-              />
-              <button type="submit" style={{ backgroundColor: '#f59e0b', color: '#000000', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px' }}>Verify & Enter</button>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Hero Section */}
       <section id="home" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 40px 60px', position: 'relative', zIndex: 10, maxWidth: '1300px', margin: '0 auto', gap: '60px', flexWrap: 'wrap' }}>
