@@ -108,7 +108,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // THE INTERACTIVE NEURAL MATRIX & SYNAPTIC WEB CANVAS
+  // DIGITAL MATRIX RAIN / DATA STREAM CANVAS
   useEffect(() => {
     if (!mounted) return;
 
@@ -128,7 +128,7 @@ export default function Home() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Mouse coordinates tracker for synaptic charge
+    // Track cursor for glowing data interactive effect
     let mouseX = -1000;
     let mouseY = -1000;
     const handleMouseMove = (e: MouseEvent) => {
@@ -137,73 +137,49 @@ export default function Home() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Neural nodes
-    const nodes: { x: number; y: number; vx: number; vy: number; radius: number; baseAlpha: number; pulseSpeed: number }[] = [];
-    const nodeCount = 65;
+    const fontSize = 14;
+    const columns = Math.floor(width / fontSize);
+    const drops: number[] = [];
+    
+    // Characters used in the matrix rain: binary, hex, math, and data symbols
+    const chars = '01101001010100101010110101010xFF4A89C190λΣ∏∇∂∫';
 
-    for (let i = 0; i < nodeCount; i++) {
-      nodes.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
-        radius: Math.random() * 2 + 1,
-        baseAlpha: Math.random() * 0.5 + 0.3,
-        pulseSpeed: Math.random() * 0.04 + 0.02
-      });
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.floor(Math.random() * -100);
     }
 
-    let frame = 0;
     const render = () => {
-      frame++;
-      ctx.clearRect(0, 0, width, height);
+      // Soft dark fade trail
+      ctx.fillStyle = 'rgba(8, 8, 8, 0.12)';
+      ctx.fillRect(0, 0, width, height);
 
-      // Update & Draw Neurons / Synaptic Connections
-      nodes.forEach((node, i) => {
-        node.x += node.vx;
-        node.y += node.vy;
+      ctx.font = `${fontSize}px monospace`;
 
-        if (node.x < 0 || node.x > width) node.vx *= -1;
-        if (node.y < 0 || node.y > height) node.vy *= -1;
+      for (let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
 
-        // Draw Neuron Node
-        const pulse = Math.sin(frame * node.pulseSpeed) * 0.3 + 0.7;
-        ctx.fillStyle = `rgba(139, 92, 246, ${node.baseAlpha * pulse})`; // Neon violet glow
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius * pulse, 0, Math.PI * 2);
-        ctx.fill();
+        const dx = x - mouseX;
+        const dy = y - mouseY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // Connect with other nearby nodes
-        for (let j = i + 1; j < nodes.length; j++) {
-          const other = nodes[j];
-          const dx = node.x - other.x;
-          const dy = node.y - other.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 160) {
-            const alpha = (1 - dist / 160) * 0.35;
-            
-            // Check distance to mouse for electric synapse activation
-            const mdx = node.x - mouseX;
-            const mdy = node.y - mouseY;
-            const mouseDist = Math.sqrt(mdx * mdx + mdy * mdy);
-            
-            if (mouseDist < 180) {
-              // Synaptic spark near cursor (Cyan/Blue electricity)
-              ctx.strokeStyle = `rgba(56, 189, 248, ${alpha * 2.5})`;
-              ctx.lineWidth = 1.2;
-            } else {
-              ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-              ctx.lineWidth = 0.7;
-            }
-
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(other.x, other.y);
-            ctx.stroke();
-          }
+        // Interactive mouse glow (Cyan/Bright Blue near cursor, soft Violet/Green further away)
+        if (dist < 150) {
+          ctx.fillStyle = '#38bdf8'; // Bright cyan charge
+        } else if (Math.random() > 0.95) {
+          ctx.fillStyle = '#ffffff'; // White lead spark
+        } else {
+          ctx.fillStyle = 'rgba(139, 92, 246, 0.45)'; // Soft neon purple stream
         }
-      });
+
+        ctx.fillText(char, x, y);
+
+        if (y > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -264,7 +240,7 @@ export default function Home() {
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive neural matrix background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive Digital Matrix Rain data background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
