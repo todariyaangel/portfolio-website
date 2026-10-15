@@ -108,6 +108,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
+  // THE INTERACTIVE NEURAL MATRIX & SYNAPTIC WEB CANVAS
   useEffect(() => {
     if (!mounted) return;
 
@@ -127,54 +128,79 @@ export default function Home() {
     };
     window.addEventListener('resize', handleResize);
 
-    const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+    // Mouse coordinates tracker for synaptic charge
+    let mouseX = -1000;
+    let mouseY = -1000;
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
 
-    const particles: { x: number; y: number; vx: number; vy: number; radius: number; color: string; pulse: number }[] = [];
-    for (let i = 0; i < 75; i++) {
-      particles.push({
+    // Neural nodes
+    const nodes: { x: number; y: number; vx: number; vy: number; radius: number; baseAlpha: number; pulseSpeed: number }[] = [];
+    const nodeCount = 65;
+
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: (Math.random() - 0.5) * 0.8,
-        radius: Math.random() * 2.2 + 0.8,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        pulse: Math.random() * Math.PI
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        radius: Math.random() * 2 + 1,
+        baseAlpha: Math.random() * 0.5 + 0.3,
+        pulseSpeed: Math.random() * 0.04 + 0.02
       });
     }
 
+    let frame = 0;
     const render = () => {
+      frame++;
       ctx.clearRect(0, 0, width, height);
 
-      particles.forEach((p, index) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.pulse += 0.03;
+      // Update & Draw Neurons / Synaptic Connections
+      nodes.forEach((node, i) => {
+        node.x += node.vx;
+        node.y += node.vy;
 
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
+        if (node.x < 0 || node.x > width) node.vx *= -1;
+        if (node.y < 0 || node.y > height) node.vy *= -1;
 
-        const currentRadius = p.radius + Math.sin(p.pulse) * 0.5;
-
-        ctx.fillStyle = p.color;
+        // Draw Neuron Node
+        const pulse = Math.sin(frame * node.pulseSpeed) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(139, 92, 246, ${node.baseAlpha * pulse})`; // Neon violet glow
         ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.max(0.5, currentRadius), 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, node.radius * pulse, 0, Math.PI * 2);
         ctx.fill();
 
-        for (let j = index + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
+        // Connect with other nearby nodes
+        for (let j = i + 1; j < nodes.length; j++) {
+          const other = nodes[j];
+          const dx = node.x - other.x;
+          const dy = node.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 150) {
-            ctx.strokeStyle = p.color;
-            ctx.globalAlpha = (1 - dist / 150) * 0.3;
-            ctx.lineWidth = 0.9;
+          if (dist < 160) {
+            const alpha = (1 - dist / 160) * 0.35;
+            
+            // Check distance to mouse for electric synapse activation
+            const mdx = node.x - mouseX;
+            const mdy = node.y - mouseY;
+            const mouseDist = Math.sqrt(mdx * mdx + mdy * mdy);
+            
+            if (mouseDist < 180) {
+              // Synaptic spark near cursor (Cyan/Blue electricity)
+              ctx.strokeStyle = `rgba(56, 189, 248, ${alpha * 2.5})`;
+              ctx.lineWidth = 1.2;
+            } else {
+              ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
+              ctx.lineWidth = 0.7;
+            }
+
             ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(other.x, other.y);
             ctx.stroke();
-            ctx.globalAlpha = 1.0;
           }
         }
       });
@@ -186,6 +212,7 @@ export default function Home() {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
   }, [mounted]);
@@ -237,7 +264,7 @@ export default function Home() {
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive particle background network; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive neural matrix background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
@@ -322,7 +349,7 @@ export default function Home() {
 
       </section>
 
-      {/* NEW: Overview / Introduction Section */}
+      {/* Overview / Introduction Section */}
       <section id="about" style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
         <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ Overview</div>
         <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '28px' }}>Introduction</h2>
@@ -335,7 +362,6 @@ export default function Home() {
             From engineering enterprise-grade <span style={{ color: '#38bdf8' }}>AI Guardrail Gateways</span> that protect LLMs against prompt injection attacks to constructing robust end-to-end data pipelines and hypothesis testing suites, I build scalable, ethical, and performant AI solutions that solve complex real-world challenges.
           </p>
 
-          {/* Quick Metrics / Highlights Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginTop: '36px', paddingTop: '28px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#f59e0b' }}>IIT Guwahati</div>
