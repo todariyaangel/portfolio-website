@@ -108,7 +108,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // DUAL-LAYER ENGINE: MATRIX DATA RAIN + TRANSFORMER ATTENTION CLUSTER
+  // REFINED DUAL-LAYER ENGINE: FAINT MATRIX RAIN + CRISP ATTENTION CLUSTER
   useEffect(() => {
     if (!mounted) return;
 
@@ -136,26 +136,26 @@ export default function Home() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Layer 1: Matrix Data Rain Setup
-    const characters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzλθμσ$\\|/<>{}[]=+*#';
-    const fontSize = 13;
+    // Layer 1: Subtle Matrix Data Rain Setup
+    const characters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZλθμσ$\\|/<>{}[]=+*#';
+    const fontSize = 14;
     let columns = Math.floor(width / fontSize);
     let drops: number[] = [];
     for (let i = 0; i < columns; i++) {
-      drops[i] = Math.floor(Math.random() * -50);
+      drops[i] = Math.floor(Math.random() * -60);
     }
 
-    // Layer 2: Transformer Attention Cluster Tokens Setup
-    const tokenCount = 55;
+    // Layer 2: Transformer Attention Cluster Tokens Setup (Balanced count)
+    const tokenCount = 45;
     const tokens: { x: number; y: number; vx: number; vy: number; label: string; cluster: number }[] = [];
-    const labels = ['[0.23, -0.89]', '[0.74, 0.12]', 'embed_77', 'query_vec', 'latent_z', 'attn_head', 'token_id', 'cos_sim'];
+    const labels = ['[0.23, -0.89]', '[0.74, 0.12]', 'embed_77', 'query_vec', 'latent_z', 'attn_head'];
 
     for (let i = 0; i < tokenCount; i++) {
       tokens.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
         label: labels[Math.floor(Math.random() * labels.length)],
         cluster: Math.floor(Math.random() * 3)
       });
@@ -165,27 +165,28 @@ export default function Home() {
     const render = () => {
       frame++;
       
-      // Clear with slight trailing opacity for Matrix effect
-      ctx.fillStyle = 'rgba(8, 8, 8, 0.15)';
+      // Clear canvas with clean background trail
+      ctx.fillStyle = 'rgba(8, 8, 8, 0.2)';
       ctx.fillRect(0, 0, width, height);
 
-      // --- RENDER LAYER 1: MATRIX RAIN ---
+      // --- RENDER LAYER 1: FAINT MATRIX RAIN (Deep Background) ---
       ctx.font = `${fontSize}px monospace`;
       for (let i = 0; i < drops.length; i++) {
         const text = characters.charAt(Math.floor(Math.random() * characters.length));
-        ctx.fillStyle = i % 3 === 0 ? 'rgba(56, 189, 248, 0.25)' : 'rgba(139, 92, 246, 0.18)';
+        // Kept intentionally low-opacity to avoid visual clutter
+        ctx.fillStyle = i % 4 === 0 ? 'rgba(56, 189, 248, 0.12)' : 'rgba(139, 92, 246, 0.08)';
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+        if (drops[i] * fontSize > height && Math.random() > 0.98) {
           drops[i] = 0;
         }
         drops[i]++;
       }
 
-      // --- RENDER LAYER 2: ATTENTION CLUSTER & VECTOR EMBEDDINGS ---
+      // --- RENDER LAYER 2: CRISP ATTENTION CLUSTER & EMBEDDINGS (Foreground) ---
       tokens.forEach((token, i) => {
-        token.x += token.vx + Math.sin(frame * 0.02 + i) * 0.1;
-        token.y += token.vy + Math.cos(frame * 0.02 + i) * 0.1;
+        token.x += token.vx + Math.sin(frame * 0.02 + i) * 0.08;
+        token.y += token.vy + Math.cos(frame * 0.02 + i) * 0.08;
 
         if (token.x < 0 || token.x > width) token.vx *= -1;
         if (token.y < 0 || token.y > height) token.vy *= -1;
@@ -194,23 +195,23 @@ export default function Home() {
         const mdy = token.y - mouseY;
         const mouseDist = Math.sqrt(mdx * mdx + mdy * mdy);
 
-        const isCloseToQuery = mouseDist < 180;
-        ctx.fillStyle = isCloseToQuery ? '#38bdf8' : 'rgba(139, 92, 246, 0.7)';
+        const isCloseToQuery = mouseDist < 160;
+        ctx.fillStyle = isCloseToQuery ? '#38bdf8' : 'rgba(139, 92, 246, 0.55)';
         ctx.beginPath();
-        ctx.arc(token.x, token.y, isCloseToQuery ? 4 : 2.5, 0, Math.PI * 2);
+        ctx.arc(token.x, token.y, isCloseToQuery ? 3.5 : 2, 0, Math.PI * 2);
         ctx.fill();
 
         // Attention weights connection to cursor query vector
         if (isCloseToQuery) {
-          const alpha = (1 - mouseDist / 180) * 0.85;
+          const alpha = (1 - mouseDist / 160) * 0.75;
           ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
-          ctx.lineWidth = 1.2;
+          ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(mouseX, mouseY);
           ctx.lineTo(token.x, token.y);
           ctx.stroke();
 
-          ctx.fillStyle = 'rgba(56, 189, 248, 0.85)';
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.8)';
           ctx.font = '9px monospace';
           ctx.fillText(token.label, token.x + 8, token.y - 8);
         }
@@ -222,10 +223,10 @@ export default function Home() {
           const dy = token.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 120 && token.cluster === other.cluster) {
-            const alpha = (1 - dist / 120) * 0.25;
+          if (dist < 110 && token.cluster === other.cluster) {
+            const alpha = (1 - dist / 110) * 0.18;
             ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-            ctx.lineWidth = 0.6;
+            ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(token.x, token.y);
             ctx.lineTo(other.x, other.y);
@@ -236,10 +237,10 @@ export default function Home() {
 
       // Query vector cursor ring
       if (mouseX > 0 && mouseY > 0) {
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(mouseX, mouseY, 25 + Math.sin(frame * 0.1) * 4, 0, Math.PI * 2);
+        ctx.arc(mouseX, mouseY, 22 + Math.sin(frame * 0.1) * 3, 0, Math.PI * 2);
         ctx.stroke();
       }
 
@@ -290,7 +291,7 @@ export default function Home() {
       const lower = userMsg.toLowerCase();
       
       if (lower.includes('project') || lower.includes('guardrail') || lower.includes('gateway')) {
-        reply = "Angel built the **AI Guardrail Gateway**: an enterprise-grade LLM proxy control plane built with FastAPI and Docker. It features real-time semantic **Input Defense** (blocking prompt injections/jailbreaks), **Privacy Guardrails** (automated regex and BERT-based PII entity redaction), and **Output Validation** (rigid schema enforcement and hallucination checks).";
+        reply = "Angel built the **AI Guardrail Gateway**: an enterprise-grade LLM proxy control plane built with FastAPI and Docker to detect prompt injections, redact PII, and enforce structural output guardrails in real-time.";
       } else if (lower.includes('ecommerce') || lower.includes('pipeline') || lower.includes('analytics')) {
         reply = "Angel built the **End-to-End E-Commerce Data Engineering & Analytics Pipeline**: built with Python and PostgreSQL to ingest raw logs, structure relational schemas, execute complex SQL CTEs, and perform mathematical hypothesis checks (Independent T-Tests) using SciPy.";
       } else if (lower.includes('skill') || lower.includes('python') || lower.includes('stack') || lower.includes('tech') || lower.includes('tools')) {
@@ -302,7 +303,7 @@ export default function Home() {
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) A Dual-Layer Matrix Data Rain & Transformer Attention Cluster background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) A Refined Dual-Layer Matrix Rain & Attention Cluster background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
@@ -320,8 +321,8 @@ export default function Home() {
         <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 1 }} />
       )}
 
-      <div style={{ position: 'absolute', top: '10%', left: '30%', width: '400px', height: '400px', backgroundColor: 'rgba(120, 50, 255, 0.12)', filter: 'blur(130px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
-      <div style={{ position: 'absolute', top: '40%', right: '20%', width: '450px', height: '450px', backgroundColor: 'rgba(50, 120, 255, 0.1)', filter: 'blur(140px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
+      <div style={{ position: 'absolute', top: '10%', left: '30%', width: '400px', height: '400px', backgroundColor: 'rgba(120, 50, 255, 0.1)', filter: 'blur(130px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
+      <div style={{ position: 'absolute', top: '40%', right: '20%', width: '450px', height: '450px', backgroundColor: 'rgba(50, 120, 255, 0.08)', filter: 'blur(140px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
 
       {/* Navigation Header */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, backgroundColor: 'rgba(8, 8, 8, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
