@@ -15,6 +15,84 @@ const technologies = [
   "LangChain", "OpenAI API", "Vector Databases (ChromaDB)", "Hugging Face Transformers"
 ];
 
+// Interactive Custom Motion Cursor Component
+function CustomCursor() {
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'A' ||
+        target.tagName === 'BUTTON' ||
+        target.closest('a') ||
+        target.closest('button') ||
+        target.classList.contains('card-hover-box')
+      ) {
+        setIsHovered(true);
+      } else {
+        setIsHovered(false);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseover', handleMouseOver);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseover', handleMouseOver);
+    };
+  }, []);
+
+  return (
+    <>
+      <motion.div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '8px',
+          height: '8px',
+          backgroundColor: '#38bdf8',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 9999,
+        }}
+        animate={{
+          x: cursorPos.x - 4,
+          y: cursorPos.y - 4,
+        }}
+        transition={{ type: 'spring', damping: 30, stiffness: 400, mass: 0.1 }}
+      />
+      <motion.div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          borderRadius: '50%',
+          border: '1px solid rgba(56, 189, 248, 0.5)',
+          pointerEvents: 'none',
+          zIndex: 9998,
+        }}
+        animate={{
+          x: cursorPos.x - (isHovered ? 24 : 16),
+          y: cursorPos.y - (isHovered ? 24 : 16),
+          width: isHovered ? '48px' : '32px',
+          height: isHovered ? '48px' : '32px',
+          backgroundColor: isHovered ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+          borderColor: isHovered ? '#38bdf8' : 'rgba(255, 255, 255, 0.3)',
+        }}
+        transition={{ type: 'spring', damping: 25, stiffness: 250, mass: 0.2 }}
+      />
+    </>
+  );
+}
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(0);
@@ -30,7 +108,6 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // Complex, Creative & High-Density Interactive Particle Background
   useEffect(() => {
     if (!mounted) return;
 
@@ -113,7 +190,6 @@ export default function Home() {
     };
   }, [mounted]);
 
-  // Hero title auto-rotate
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTitle((prev) => (prev + 1) % heroTitles.length);
@@ -121,7 +197,6 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  // 360-degree mouse tilt for hero photo card
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-150, 150], [20, -20]);
@@ -138,7 +213,6 @@ export default function Home() {
     y.set(0);
   };
 
-  // AI CHATBOT KNOWLEDGE BASE
   const handleChatSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -175,20 +249,21 @@ export default function Home() {
   return (
     <div style={{ backgroundColor: '#080808', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', position: 'relative', overflowX: 'hidden' }}>
       
-      {/* Complex Colorful Interactive Moving Background Canvas */}
+      <CustomCursor />
+
       {mounted && (
         <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 1 }} />
       )}
 
-      {/* Background Glow Effect */}
       <div style={{ position: 'absolute', top: '10%', left: '30%', width: '400px', height: '400px', backgroundColor: 'rgba(120, 50, 255, 0.12)', filter: 'blur(130px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
       <div style={{ position: 'absolute', top: '40%', right: '20%', width: '450px', height: '450px', backgroundColor: 'rgba(50, 120, 255, 0.1)', filter: 'blur(140px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
 
-      {/* Navigation Header (Control Panel Button Removed for Visitors) */}
+      {/* Navigation Header */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, backgroundColor: 'rgba(8, 8, 8, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontWeight: 800, letterSpacing: '2px', fontSize: '13px', textTransform: 'uppercase' }}>ANGEL TODARIYA</span>
         <nav style={{ display: 'flex', gap: '28px', fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', color: '#a1a1aa' }}>
           <a href="#home" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Home</a>
+          <a href="#about" style={{ color: '#a1a1aa', textDecoration: 'none' }}>About</a>
           <a href="#education" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Education</a>
           <a href="#certifications" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Certifications</a>
           <a href="#skills" style={{ color: '#a1a1aa', textDecoration: 'none' }}>Skills</a>
@@ -200,7 +275,6 @@ export default function Home() {
       {/* Hero Section */}
       <section id="home" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 40px 60px', position: 'relative', zIndex: 10, maxWidth: '1300px', margin: '0 auto', gap: '60px', flexWrap: 'wrap' }}>
         
-        {/* Left: Dynamic Title Switcher */}
         <div style={{ flex: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ height: '140px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <AnimatePresence mode="wait">
@@ -223,7 +297,6 @@ export default function Home() {
           <p style={{ fontSize: '11px', color: '#71717a', letterSpacing: '2px', textTransform: 'uppercase', marginTop: '32px' }}>↓ Scroll to explore portfolio</p>
         </div>
 
-        {/* Right: 360 Interactive Movable Photo Card */}
         <div style={{ perspective: '1000px', flexShrink: 0 }}>
           <motion.div 
             onMouseMove={handleMouseMove}
@@ -247,6 +320,37 @@ export default function Home() {
           </motion.div>
         </div>
 
+      </section>
+
+      {/* NEW: Overview / Introduction Section */}
+      <section id="about" style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
+        <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ Overview</div>
+        <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '28px' }}>Introduction</h2>
+        
+        <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px', padding: '40px', backdropFilter: 'blur(8px)' }}>
+          <p style={{ fontSize: '18px', lineHeight: '1.8', color: '#e4e4e7', margin: '0 0 24px', fontWeight: 300 }}>
+            I am a passionate <strong style={{ color: '#ffffff', fontWeight: 600 }}>Data Scientist & AI Engineer</strong> currently pursuing a B.Sc. (Hons) in Data Science and Artificial Intelligence at the <strong style={{ color: '#f59e0b', fontWeight: 600 }}>Indian Institute of Technology (IIT) Guwahati</strong>. My work sits at the intersection of mathematically rigorous machine learning algorithms and production-ready enterprise infrastructure.
+          </p>
+          <p style={{ fontSize: '15px', lineHeight: '1.8', color: '#a1a1aa', margin: 0 }}>
+            From engineering enterprise-grade <span style={{ color: '#38bdf8' }}>AI Guardrail Gateways</span> that protect LLMs against prompt injection attacks to constructing robust end-to-end data pipelines and hypothesis testing suites, I build scalable, ethical, and performant AI solutions that solve complex real-world challenges.
+          </p>
+
+          {/* Quick Metrics / Highlights Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginTop: '36px', paddingTop: '28px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#f59e0b' }}>IIT Guwahati</div>
+              <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>B.Sc. (Hons) DS & AI</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#38bdf8' }}>LLM & GenAI</div>
+              <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Guardrails & Redaction</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#10b981' }}>IBM Certified</div>
+              <div style={{ fontSize: '11px', color: '#71717a', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>Generative AI Essentials</div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Education Section */}
