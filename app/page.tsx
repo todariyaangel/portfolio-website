@@ -15,7 +15,7 @@ const technologies = [
   "LangChain", "OpenAI API", "Vector Databases (ChromaDB)", "Hugging Face Transformers"
 ];
 
-// Interactive Custom Motion Cursor Component
+// Custom Motion Cursor Component
 function CustomCursor() {
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
@@ -108,7 +108,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // INTERACTIVE VORONOI FLUID MESH CANVAS
+  // PROCEDURAL 3D NEURAL NETWORK BRAIN ENGINE
   useEffect(() => {
     if (!mounted) return;
 
@@ -128,67 +128,148 @@ export default function Home() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Track mouse for interactive fluid warping
-    let mouseX = width / 2;
-    let mouseY = height / 2;
+    // Mouse tracking for interactive 3D rotation bias
+    let mouseX = 0;
+    let mouseY = 0;
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      mouseX = (e.clientX - width / 2) / (width / 2);
+      mouseY = (e.clientY - height / 2) / (height / 2);
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Voronoi cellular nodes
-    const pointCount = 35;
-    const points: { x: number; y: number; vx: number; vy: number }[] = [];
+    // Generate 3D Brain Point Cloud (Ellipsoidal procedural mesh with dual hemisphere gap)
+    interface Point3D {
+      x: number;
+      y: number;
+      z: number;
+      baseX: number;
+      baseY: number;
+      baseZ: number;
+      pulse: number;
+    }
 
-    for (let i = 0; i < pointCount; i++) {
-      points.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: (Math.random() - 0.5) * 0.7
+    const brainNodes: Point3D[] = [];
+    const nodeCount = 140;
+    const scale = Math.min(width, height) * 0.28;
+
+    for (let i = 0; i < nodeCount; i++) {
+      // Procedural brain shape generation
+      const u = Math.random() * Math.PI * 2;
+      const v = Math.random() * Math.PI;
+      
+      // Dual hemisphere offset
+      const side = Math.random() > 0.5 ? 1 : -1;
+      const hemisphereOffset = side * 0.18;
+
+      let rx = Math.sin(v) * Math.cos(u) * 0.95 + hemisphereOffset;
+      let ry = Math.cos(v) * 0.75;
+      let rz = Math.sin(v) * Math.sin(u) * 1.2;
+
+      // Add anatomical cortex contours
+      const noise = Math.sin(rx * 5) * Math.cos(ry * 5) * 0.1;
+      rx += noise;
+      ry += noise;
+      rz += noise;
+
+      brainNodes.push({
+        x: rx * scale,
+        y: ry * scale,
+        z: rz * scale,
+        baseX: rx * scale,
+        baseY: ry * scale,
+        baseZ: rz * scale,
+        pulse: Math.random() * Math.PI * 2
       });
     }
 
-    let angle = 0;
+    let rotY = 0;
+    let rotX = 0;
+
     const render = () => {
-      angle += 0.015;
       ctx.clearRect(0, 0, width, height);
 
-      // Update cellular points with organic sine wave drift
-      points.forEach((p, idx) => {
-        p.x += p.vx + Math.cos(angle + idx) * 0.3;
-        p.y += p.vy + Math.sin(angle + idx) * 0.3;
+      // Smooth continuous Y-axis rotation + mouse influence
+      rotY += 0.006 + mouseX * 0.005;
+      rotX += (mouseY * 0.2 - rotX) * 0.05;
 
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
+      const cosY = Math.cos(rotY);
+      const sinY = Math.sin(rotY);
+      const cosX = Math.cos(rotX);
+      const sinX = Math.sin(rotX);
 
-        // Draw glowing cellular node vertex
-        const distToMouse = Math.sqrt((p.x - mouseX) ** 2 + (p.y - mouseY) ** 2);
-        const radius = distToMouse < 200 ? 3.5 : 2;
+      // Center of perspective projection
+      const centerX = width * 0.35; // Positioned on left side behind hero text
+      const centerY = height * 0.45;
+      const fov = 450;
 
-        ctx.fillStyle = distToMouse < 200 ? '#38bdf8' : 'rgba(139, 92, 246, 0.7)';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-        ctx.fill();
+      // Projected 2D points array for rendering axons
+      const projected: { x: number; y: number; z: number; scale: number; pulse: number }[] = [];
 
-        // Connect nearby points to form dynamic polygonal mesh webs
-        for (let j = idx + 1; j < points.length; j++) {
-          const p2 = points[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
+      brainNodes.forEach((node) => {
+        node.pulse += 0.03;
+
+        // 3D Rotation Matrix Calculations (Y then X)
+        let x1 = node.baseX * cosY - node.baseZ * sinY;
+        let z1 = node.baseZ * cosY + node.baseX * sinY;
+
+        let y2 = node.baseY * cosX - z1 * sinX;
+        let z2 = z1 * cosX + node.baseY * sinX;
+
+        // Perspective Projection
+        const zPerspective = z2 + 600;
+        const scaleProj = fov / zPerspective;
+        const projX = x1 * scaleProj + centerX;
+        const projY = y2 * scaleProj + centerY;
+
+        projected.push({
+          x: projX,
+          y: projY,
+          z: z2,
+          scale: scaleProj,
+          pulse: node.pulse
+        });
+      });
+
+      // Render 3D Axon Connections (Synapses)
+      for (let i = 0; i < projected.length; i++) {
+        for (let j = i + 1; j < projected.length; j++) {
+          const p1 = projected[i];
+          const p2 = projected[j];
+
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 180) {
-            const alpha = (1 - dist / 180) * 0.35;
-            ctx.strokeStyle = distToMouse < 200 ? `rgba(56, 189, 248, ${alpha * 1.8})` : `rgba(139, 92, 246, ${alpha})`;
-            ctx.lineWidth = 0.8;
+          // Connect nodes within distance threshold
+          if (dist < 85) {
+            const alpha = (1 - dist / 85) * 0.25;
+            const depthAlpha = Math.max(0.1, (p1.z + 200) / 400);
+
+            // Electric synaptic impulse firing along connections
+            const impulse = Math.sin(p1.pulse) > 0.85;
+            ctx.strokeStyle = impulse
+              ? `rgba(56, 189, 248, ${alpha * 2.5})`
+              : `rgba(139, 92, 246, ${alpha * depthAlpha})`;
+            ctx.lineWidth = impulse ? 1.2 : 0.6;
+
             ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
+            ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
         }
+      }
+
+      // Render 3D Synaptic Nodes
+      projected.forEach((p) => {
+        const radius = Math.max(0.8, p.scale * 2.2);
+        const depthAlpha = Math.max(0.15, (p.z + 200) / 400);
+        const glow = Math.sin(p.pulse) * 0.3 + 0.7;
+
+        ctx.fillStyle = `rgba(56, 189, 248, ${depthAlpha * glow})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+        ctx.fill();
       });
 
       animationFrameId = requestAnimationFrame(render);
@@ -246,11 +327,11 @@ export default function Home() {
       } else if (lower.includes('education') || lower.includes('iit') || lower.includes('guwahati') || lower.includes('degree') || lower.includes('curriculum')) {
         reply = "Angel is pursuing a prestigious B.Sc. (Hons) in Data Science and Artificial Intelligence at the **Indian Institute of Technology (IIT) Guwahati**, expected to complete by September 2030. Her rigorous curriculum covers Data Structures and Algorithms, Machine Learning, Deep Learning, Linear Algebra, Statistics, Probability, and AI Ethics.";
       } else if (lower.includes('soft skill') || lower.includes('communication') || lower.includes('collaborat') || lower.includes('personality')) {
-        reply = "Angel is an exceptionally strong communicator and collaborative team player. Sah blends deep technical mastery with clear, articulate communication, enabling her to bridge complex engineering architectures with business goals seamlessly.";
+        reply = "Angel is an exceptionally strong communicator and collaborative team player. She combines deep technical mastery with clear, articulate communication, enabling her to bridge complex engineering architectures with business goals seamlessly.";
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An interactive Voronoi fluid mesh background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) A Procedural 3D Neural Network Brain background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
@@ -268,8 +349,8 @@ export default function Home() {
         <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 1 }} />
       )}
 
-      <div style={{ position: 'absolute', top: '10%', left: '30%', width: '400px', height: '400px', backgroundColor: 'rgba(120, 50, 255, 0.12)', filter: 'blur(130px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
-      <div style={{ position: 'absolute', top: '40%', right: '20%', width: '450px', height: '450px', backgroundColor: 'rgba(50, 120, 255, 0.1)', filter: 'blur(140px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
+      <div style={{ position: 'absolute', top: '10%', left: '20%', width: '450px', height: '450px', backgroundColor: 'rgba(56, 189, 248, 0.08)', filter: 'blur(140px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
+      <div style={{ position: 'absolute', top: '40%', right: '20%', width: '450px', height: '450px', backgroundColor: 'rgba(139, 92, 246, 0.08)', filter: 'blur(140px)', borderRadius: '50%', pointerEvents: 'none', zIndex: 2 }}></div>
 
       {/* Navigation Header */}
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, backgroundColor: 'rgba(8, 8, 8, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
