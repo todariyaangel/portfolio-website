@@ -108,7 +108,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // TRANSFORMER ATTENTION CLUSTER & VECTOR EMBEDDING SPACE ENGINE
+  // DUAL-LAYER ENGINE: MATRIX DATA RAIN + TRANSFORMER ATTENTION CLUSTER
   useEffect(() => {
     if (!mounted) return;
 
@@ -136,7 +136,17 @@ export default function Home() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    const tokenCount = 70;
+    // Layer 1: Matrix Data Rain Setup
+    const characters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzλθμσ$\\|/<>{}[]=+*#';
+    const fontSize = 13;
+    let columns = Math.floor(width / fontSize);
+    let drops: number[] = [];
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.floor(Math.random() * -50);
+    }
+
+    // Layer 2: Transformer Attention Cluster Tokens Setup
+    const tokenCount = 55;
     const tokens: { x: number; y: number; vx: number; vy: number; label: string; cluster: number }[] = [];
     const labels = ['[0.23, -0.89]', '[0.74, 0.12]', 'embed_77', 'query_vec', 'latent_z', 'attn_head', 'token_id', 'cos_sim'];
 
@@ -144,8 +154,8 @@ export default function Home() {
       tokens.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
         label: labels[Math.floor(Math.random() * labels.length)],
         cluster: Math.floor(Math.random() * 3)
       });
@@ -154,23 +164,28 @@ export default function Home() {
     let frame = 0;
     const render = () => {
       frame++;
-      ctx.clearRect(0, 0, width, height);
+      
+      // Clear with slight trailing opacity for Matrix effect
+      ctx.fillStyle = 'rgba(8, 8, 8, 0.15)';
+      ctx.fillRect(0, 0, width, height);
 
-      // Draw faint vector space grid background
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
-      ctx.lineWidth = 1;
-      const gridSize = 70;
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+      // --- RENDER LAYER 1: MATRIX RAIN ---
+      ctx.font = `${fontSize}px monospace`;
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillStyle = i % 3 === 0 ? 'rgba(56, 189, 248, 0.25)' : 'rgba(139, 92, 246, 0.18)';
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
       }
 
-      // Update & Draw Embedding Tokens
+      // --- RENDER LAYER 2: ATTENTION CLUSTER & VECTOR EMBEDDINGS ---
       tokens.forEach((token, i) => {
-        token.x += token.vx + Math.sin(frame * 0.02 + i) * 0.15;
-        token.y += token.vy + Math.cos(frame * 0.02 + i) * 0.15;
+        token.x += token.vx + Math.sin(frame * 0.02 + i) * 0.1;
+        token.y += token.vy + Math.cos(frame * 0.02 + i) * 0.1;
 
         if (token.x < 0 || token.x > width) token.vx *= -1;
         if (token.y < 0 || token.y > height) token.vy *= -1;
@@ -180,14 +195,14 @@ export default function Home() {
         const mouseDist = Math.sqrt(mdx * mdx + mdy * mdy);
 
         const isCloseToQuery = mouseDist < 180;
-        ctx.fillStyle = isCloseToQuery ? '#38bdf8' : 'rgba(139, 92, 246, 0.6)';
+        ctx.fillStyle = isCloseToQuery ? '#38bdf8' : 'rgba(139, 92, 246, 0.7)';
         ctx.beginPath();
-        ctx.arc(token.x, token.y, isCloseToQuery ? 3.5 : 2, 0, Math.PI * 2);
+        ctx.arc(token.x, token.y, isCloseToQuery ? 4 : 2.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Attention weights connection to query vector cursor
+        // Attention weights connection to cursor query vector
         if (isCloseToQuery) {
-          const alpha = (1 - mouseDist / 180) * 0.8;
+          const alpha = (1 - mouseDist / 180) * 0.85;
           ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
           ctx.lineWidth = 1.2;
           ctx.beginPath();
@@ -195,22 +210,22 @@ export default function Home() {
           ctx.lineTo(token.x, token.y);
           ctx.stroke();
 
-          ctx.fillStyle = 'rgba(56, 189, 248, 0.7)';
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.85)';
           ctx.font = '9px monospace';
           ctx.fillText(token.label, token.x + 8, token.y - 8);
         }
 
-        // Intra-cluster semantic connections
+        // Semantic connections within clusters
         for (let j = i + 1; j < tokens.length; j++) {
           const other = tokens[j];
           const dx = token.x - other.x;
           const dy = token.y - other.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 130 && token.cluster === other.cluster) {
-            const alpha = (1 - dist / 130) * 0.2;
+          if (dist < 120 && token.cluster === other.cluster) {
+            const alpha = (1 - dist / 120) * 0.25;
             ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 0.6;
             ctx.beginPath();
             ctx.moveTo(token.x, token.y);
             ctx.lineTo(other.x, other.y);
@@ -221,7 +236,7 @@ export default function Home() {
 
       // Query vector cursor ring
       if (mouseX > 0 && mouseY > 0) {
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(mouseX, mouseY, 25 + Math.sin(frame * 0.1) * 4, 0, Math.PI * 2);
@@ -287,7 +302,7 @@ export default function Home() {
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) An Interactive Transformer Attention Cluster background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) A Dual-Layer Matrix Data Rain & Transformer Attention Cluster background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
