@@ -136,7 +136,6 @@ export default function Home() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Layer 1: Subtle Matrix Data Rain Setup
     const characters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZλθμσ$\\|/<>{}[]=+*#';
     const fontSize = 14;
     let columns = Math.floor(width / fontSize);
@@ -145,7 +144,6 @@ export default function Home() {
       drops[i] = Math.floor(Math.random() * -60);
     }
 
-    // Layer 2: Transformer Attention Cluster Tokens Setup (Balanced count)
     const tokenCount = 45;
     const tokens: { x: number; y: number; vx: number; vy: number; label: string; cluster: number }[] = [];
     const labels = ['[0.23, -0.89]', '[0.74, 0.12]', 'embed_77', 'query_vec', 'latent_z', 'attn_head'];
@@ -164,16 +162,13 @@ export default function Home() {
     let frame = 0;
     const render = () => {
       frame++;
-      
-      // Clear canvas with clean background trail
       ctx.fillStyle = 'rgba(8, 8, 8, 0.2)';
       ctx.fillRect(0, 0, width, height);
 
-      // --- RENDER LAYER 1: FAINT MATRIX RAIN (Deep Background) ---
+      // Layer 1: Matrix Rain
       ctx.font = `${fontSize}px monospace`;
       for (let i = 0; i < drops.length; i++) {
         const text = characters.charAt(Math.floor(Math.random() * characters.length));
-        // Kept intentionally low-opacity to avoid visual clutter
         ctx.fillStyle = i % 4 === 0 ? 'rgba(56, 189, 248, 0.12)' : 'rgba(139, 92, 246, 0.08)';
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
@@ -183,7 +178,7 @@ export default function Home() {
         drops[i]++;
       }
 
-      // --- RENDER LAYER 2: CRISP ATTENTION CLUSTER & EMBEDDINGS (Foreground) ---
+      // Layer 2: Attention Cluster
       tokens.forEach((token, i) => {
         token.x += token.vx + Math.sin(frame * 0.02 + i) * 0.08;
         token.y += token.vy + Math.cos(frame * 0.02 + i) * 0.08;
@@ -201,7 +196,6 @@ export default function Home() {
         ctx.arc(token.x, token.y, isCloseToQuery ? 3.5 : 2, 0, Math.PI * 2);
         ctx.fill();
 
-        // Attention weights connection to cursor query vector
         if (isCloseToQuery) {
           const alpha = (1 - mouseDist / 160) * 0.75;
           ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
@@ -216,7 +210,6 @@ export default function Home() {
           ctx.fillText(token.label, token.x + 8, token.y - 8);
         }
 
-        // Semantic connections within clusters
         for (let j = i + 1; j < tokens.length; j++) {
           const other = tokens[j];
           const dx = token.x - other.x;
@@ -235,7 +228,6 @@ export default function Home() {
         }
       });
 
-      // Query vector cursor ring
       if (mouseX > 0 && mouseY > 0) {
         ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
         ctx.lineWidth = 1;
@@ -303,7 +295,7 @@ export default function Home() {
       } else if (lower.includes('certificate') || lower.includes('ibm') || lower.includes('credly') || lower.includes('genai')) {
         reply = "Angel holds the **IBM Generative AI Essentials: Using LLMs to work with Data** certification. You can check her verified Credly badge directly in the Certifications section!";
       } else if (lower.includes('website') || lower.includes('navigate') || lower.includes('portfolio') || lower.includes('feature') || lower.includes('guide')) {
-        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) A Refined Dual-Layer Matrix Rain & Attention Cluster background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
+        reply = "This dark-mode portfolio features: 1) A dynamic rotating title hero section with an interactive 3D 360-degree tilt photo card on the right; 2) A Scroll-triggered Dual-Layer Matrix & Attention Cluster background; 3) Detailed Education and Certifications sections with your verified IBM Credly badge link; 4) A Technologies grid and Featured Projects; and 5) A glassmorphic Contact form.";
       } else if (lower.includes('contact') || lower.includes('email') || lower.includes('phone') || lower.includes('hire') || lower.includes('opportunity')) {
         reply = "You can reach Angel directly via email at todariyaangel@gmail.com or phone at 9958799930. Her professional links include LinkedIn (linkedin.com/in/angel-todariya) and GitHub (github.com/todariyaangel).";
       }
@@ -341,7 +333,12 @@ export default function Home() {
       {/* Hero Section */}
       <section id="home" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 40px 60px', position: 'relative', zIndex: 10, maxWidth: '1300px', margin: '0 auto', gap: '60px', flexWrap: 'wrap' }}>
         
-        <div style={{ flex: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          style={{ flex: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+        >
           <div style={{ height: '140px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -361,9 +358,14 @@ export default function Home() {
             </AnimatePresence>
           </div>
           <p style={{ fontSize: '11px', color: '#71717a', letterSpacing: '2px', textTransform: 'uppercase', marginTop: '32px' }}>↓ Scroll to explore portfolio</p>
-        </div>
+        </motion.div>
 
-        <div style={{ perspective: '1000px', flexShrink: 0 }}>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          style={{ perspective: '1000px', flexShrink: 0 }}
+        >
           <motion.div 
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
@@ -384,12 +386,19 @@ export default function Home() {
               <p style={{ fontSize: '12px', color: '#a1a1aa', margin: 0 }}>B.Sc. (Hons) Data Science & AI @ IIT Guwahati • 2030</p>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
 
       </section>
 
       {/* Overview / Introduction Section */}
-      <section id="about" style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
+      <motion.section 
+        id="about" 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}
+      >
         <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ Overview</div>
         <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '28px' }}>Introduction</h2>
         
@@ -416,10 +425,17 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Education Section */}
-      <section id="education" style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
+      <motion.section 
+        id="education" 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}
+      >
         <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ Academic Path</div>
         <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '32px' }}>Education</h2>
         
@@ -438,10 +454,17 @@ export default function Home() {
             <strong>Key Coursework:</strong> Data Structures and Algorithms, Machine Learning, Deep Learning, Linear Algebra, Statistics, Probability, AI Ethics.
           </p>
         </div>
-      </section>
+      </motion.section>
 
       {/* Certifications Section */}
-      <section id="certifications" style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
+      <motion.section 
+        id="certifications" 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}
+      >
         <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ Credentials</div>
         <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '32px' }}>Certifications</h2>
         
@@ -462,10 +485,17 @@ export default function Home() {
             View Credential Badge →
           </a>
         </div>
-      </section>
+      </motion.section>
 
       {/* Skills Grid */}
-      <section id="skills" style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
+      <motion.section 
+        id="skills" 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}
+      >
         <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ System Stack</div>
         <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '40px' }}>Technologies I Work With</h2>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
@@ -475,10 +505,17 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Featured Projects */}
-      <section id="projects" style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
+      <motion.section 
+        id="projects" 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: '80px 24px', maxWidth: '1100px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}
+      >
         <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ Production Build</div>
         <h2 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '40px' }}>Featured Engineering Projects</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '28px' }}>
@@ -504,10 +541,17 @@ export default function Home() {
             <a href="https://github.com/todariyaangel/ecommerce-analytics-pipeline.git" target="_blank" style={{ color: '#f59e0b', fontWeight: 'bold', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }}>View Repository →</a>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Contact Form */}
-      <section id="contact" style={{ padding: '80px 24px', maxWidth: '800px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}>
+      <motion.section 
+        id="contact" 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        style={{ padding: '80px 24px', maxWidth: '800px', margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'relative', zIndex: 10 }}
+      >
         <div style={{ color: '#71717a', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '11px', marginBottom: '8px' }}>//@ Get In Touch</div>
         <h2 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '32px' }}>Let's Build Something Exceptional.</h2>
         <form onSubmit={(e) => { e.preventDefault(); alert("Message sent!"); }} style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '32px', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -519,7 +563,7 @@ export default function Home() {
           <textarea rows={4} placeholder="Your Message" required style={{ backgroundColor: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', padding: '14px', color: '#ffffff', outline: 'none' }}></textarea>
           <button type="submit" style={{ backgroundColor: '#ffffff', color: '#000000', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1.5px', padding: '16px', borderRadius: '12px', border: 'none', cursor: 'pointer' }}>Send Message</button>
         </form>
-      </section>
+      </motion.section>
 
       {/* Floating Chatbot Widget */}
       <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 100 }}>
