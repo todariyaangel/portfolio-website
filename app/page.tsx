@@ -404,7 +404,7 @@ export default function Home() {
         
         <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px', padding: '40px', backdropFilter: 'blur(8px)' }}>
           <p style={{ fontSize: '18px', lineHeight: '1.8', color: '#e4e4e7', margin: '0 0 24px', fontWeight: 300 }}>
-            I am a passionate <strong style={{ color: '#ffffff', fontWeight: 600 }}>Data Scientist & AI Engineer</strong> currently pursuing a B.Sc. (Hons) in Data Science and Artificial Intelligence at the <strong style={{ color: '#f59e0b', fontWeight: 600 }}>Indian Institute of Technology (IIT) Guwahati</strong>. My work sits at the intersection of mathematically rigorous machine learning algorithms and production-ready enterprise infrastructure.
+            I am an aspiring <strong style={{ color: '#ffffff', fontWeight: 600 }}>Data Scientist & AI Engineer</strong> currently pursuing a B.Sc. (Hons) in Data Science and Artificial Intelligence at the <strong style={{ color: '#f59e0b', fontWeight: 600 }}>Indian Institute of Technology (IIT) Guwahati</strong>. My work sits at the intersection of mathematically rigorous machine learning algorithms and production-ready enterprise infrastructure.
           </p>
           <p style={{ fontSize: '15px', lineHeight: '1.8', color: '#a1a1aa', margin: 0 }}>
             From engineering enterprise-grade <span style={{ color: '#38bdf8' }}>AI Guardrail Gateways</span> that protect LLMs against prompt injection attacks to constructing robust end-to-end data pipelines and hypothesis testing suites, I build scalable, ethical, and performant AI solutions that solve complex real-world challenges.
